@@ -1,46 +1,69 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import 'painting.dart';
+
 class TomatoPainter extends CustomPainter {
-  bool isAnimating;
+  final bool isAnimating;
   final BuildContext context;
-  TomatoPainter(this.context, this.isAnimating);
+  final int tomatoCount;
+  final PaintColor? colorOverride;
+  final bool isTimer;
+  TomatoPainter(this.context, this.isAnimating,
+      {this.tomatoCount = 1, this.colorOverride, this.isTimer = true});
 
   @override
   void paint(Canvas canvas, Size size) {
     // Draw the tomato
-
-    var availWidth = min(size.width, 0.8 * size.height);
-    var availHeight = size.height;
-
-    var smallestDimension = min(availHeight, availWidth);
-    var width = smallestDimension * 0.9;
+    var availWidth = size.width / tomatoCount;
+    var x = availWidth * .1;
+    var y = availWidth * .1;
+    var width = availWidth * .9;
     var height = width * 0.9;
 
-    var x = smallestDimension * 0.1;
-    var y = x;
+    for (var tomatoIdx = 0; tomatoIdx < tomatoCount; tomatoIdx++) {
+      paintTomato(x, width, y, height, canvas);
+      x += width;
+    }
+  }
 
+  void paintTomato(
+      double x, double width, double y, double height, Canvas canvas) {
     var tomatoPaint = Paint()
       ..style = PaintingStyle.fill
-      ..shader = const RadialGradient(
+      ..shader = RadialGradient(
         colors: [
-          Color.fromARGB(255, 220, 95, 95),
-          Color.fromARGB(255, 174, 59, 59)
+          colorOverride?.lighten(25) ?? const Color.fromARGB(255, 220, 95, 95),
+          colorOverride?.color ?? const Color.fromARGB(255, 174, 59, 59)
         ],
       ).createShader(Rect.fromCircle(
         center: Offset(x + width / 1.5, y + height / 3.0),
         radius: width / 2,
       ));
 
-    // var tomatoPaint = Paint()
-    //   ..color = Color.fromARGB(255, 255, 104, 104)
-    //   ..style = PaintingStyle.fill;
     canvas.drawOval(
-        Rect.fromPoints(Offset(x, y), Offset(width, height)), tomatoPaint);
+        Rect.fromPoints(Offset(x, y), Offset(x + width * .89, height)),
+        tomatoPaint);
+
+    if (isTimer) {
+      drawTimerInfo(height, x, y, width, canvas,
+          colorOverride ?? PaintColor(const Color.fromARGB(255, 220, 95, 95)));
+    }
 
     var (stemWidth, stemHeight) = drawStem(x, y, width, height, canvas);
     drawStemLeafs(canvas, x, y, width, height, stemWidth, stemHeight);
+  }
+
+  void drawTimerInfo(double height, double x, double y, double width,
+      Canvas canvas, PaintColor tomatoColor) {
+    var linePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = height / 100
+      ..color = tomatoColor.darken(40);
+
+    var linePath = Path()..moveTo(x, y + height / 2.2);
+    linePath.arcToPoint(Offset(x + width * .89, y + height / 2.2),
+        clockwise: false, radius: Radius.elliptical(width, height));
+    canvas.drawPath(linePath, linePaint);
   }
 
   (double, double) drawStem(double x, double y, double tomatoWidth,
@@ -57,11 +80,10 @@ class TomatoPainter extends CustomPainter {
         stemWidth / 3.0, stemWidth / 3.0);
 
     var paint = Paint()
-      ..color = const Color.fromARGB(255, 97, 168, 101)
       ..style = PaintingStyle.fill
-      ..shader = const LinearGradient(colors: [
-        Color.fromARGB(255, 78, 134, 81),
-        Color.fromARGB(255, 97, 168, 101)
+      ..shader = LinearGradient(colors: [
+        colorOverride?.darken() ?? const Color.fromARGB(255, 78, 134, 81),
+        colorOverride?.color ?? const Color.fromARGB(255, 97, 168, 101)
       ]).createShader(Rect.fromPoints(startingPoint, endingPoint));
 
     canvas.drawRRect(rrect, paint);
@@ -74,10 +96,10 @@ class TomatoPainter extends CustomPainter {
     var stemLeafPaint = Paint()
       ..color = const Color.fromARGB(255, 78, 134, 81)
       ..style = PaintingStyle.fill
-      ..shader = const RadialGradient(
+      ..shader = RadialGradient(
         colors: [
-          Color.fromARGB(255, 86, 148, 89),
-          Color.fromARGB(255, 57, 97, 58)
+          colorOverride?.darken() ?? const Color.fromARGB(255, 86, 148, 89),
+          colorOverride?.darken() ?? const Color.fromARGB(255, 57, 97, 58)
         ],
       ).createShader(Rect.fromCircle(
         center: Offset(x + width, y),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'ui/tomato.dart';
+import 'ui/painting.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,18 +38,25 @@ class HomePageState extends State<HomePage> {
         children: <Widget>[
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+            height: MediaQuery.of(context).size.width,
             child: CustomPaint(
               painter: TomatoPainter(context, false),
             ),
           ),
           SizedBox(
-            width: MediaQuery.of(context).size.width / 15,
-            height: MediaQuery.of(context).size.height / 15,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.width,
             child: CustomPaint(
-              painter: TomatoPainter(context, false),
+              painter: TomatoPainter(
+                context,
+                false,
+                tomatoCount: 4,
+                colorOverride:
+                    PaintColor(const Color.fromARGB(255, 255, 219, 57)),
+                isTimer: false,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
