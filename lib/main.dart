@@ -31,8 +31,8 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Tutorial - googleflutter.com'),
-        backgroundColor: const Color(0xFF444444),
+        title: const Text('Pomodoro Timer'),
+        backgroundColor: const Color.fromARGB(255, 248, 63, 63),
       ),
       body: ListView(
         children: <Widget>[

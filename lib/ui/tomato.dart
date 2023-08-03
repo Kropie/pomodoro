@@ -8,7 +8,7 @@ class TomatoPainter extends CustomPainter {
   final int tomatoCount;
   final PaintColor? colorOverride;
   final bool isTimer;
-  final PaintColor tomatoColor = PaintColor(Color.fromARGB(255, 219, 47, 47));
+  final PaintColor tomatoColor = PaintColor(Color.fromARGB(255, 255, 29, 29));
   TomatoPainter(this.context, this.isAnimating,
       {this.tomatoCount = 1, this.colorOverride, this.isTimer = true});
 
@@ -33,11 +33,12 @@ class TomatoPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..shader = RadialGradient(
         colors: [
-          colorOverride?.lighten(50) ?? tomatoColor.lighten(40),
-          colorOverride?.color ?? tomatoColor.color
+          colorOverride?.lighten(50) ?? tomatoColor.lighten(60),
+          colorOverride?.color ?? tomatoColor.color,
+          colorOverride?.darken() ?? tomatoColor.darken(30)
         ],
       ).createShader(Rect.fromCircle(
-        center: Offset(x + width / 1.5, y + height / 3.0),
+        center: Offset(x + width / 1.5, y + height / 3.5),
         radius: width / 2,
       ));
 
@@ -57,10 +58,24 @@ class TomatoPainter extends CustomPainter {
 
   void drawTimerInfo(double height, double x, double y, double width,
       Canvas canvas, PaintColor tomatoColor) {
+    // var linePaint = Paint()
+    //   ..style = PaintingStyle.stroke
+    //   ..strokeWidth = height / 100
+    //   ..color = tomatoColor.darken(40);
+
     var linePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = height / 100
-      ..color = tomatoColor.darken(40);
+      ..shader = RadialGradient(
+        colors: [
+          colorOverride?.lighten(50) ?? tomatoColor.color,
+          colorOverride?.lighten(50) ?? tomatoColor.darken(),
+          colorOverride?.color ?? tomatoColor.darken(40)
+        ],
+      ).createShader(Rect.fromCircle(
+        center: Offset(x + width / 1.5, y + height / 3.5),
+        radius: width / 2,
+      ));
 
     var linePath = Path()..moveTo(x, y + height / 2.2);
     linePath.arcToPoint(Offset(x + width * .89, y + height / 2.2),
