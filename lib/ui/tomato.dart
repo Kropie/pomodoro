@@ -8,6 +8,7 @@ class TomatoPainter extends CustomPainter {
   final int tomatoCount;
   final PaintColor? colorOverride;
   final bool isTimer;
+  final PaintColor tomatoColor = PaintColor(Color.fromARGB(255, 219, 47, 47));
   TomatoPainter(this.context, this.isAnimating,
       {this.tomatoCount = 1, this.colorOverride, this.isTimer = true});
 
@@ -32,8 +33,8 @@ class TomatoPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..shader = RadialGradient(
         colors: [
-          colorOverride?.lighten(25) ?? const Color.fromARGB(255, 220, 95, 95),
-          colorOverride?.color ?? const Color.fromARGB(255, 174, 59, 59)
+          colorOverride?.lighten(50) ?? tomatoColor.lighten(40),
+          colorOverride?.color ?? tomatoColor.color
         ],
       ).createShader(Rect.fromCircle(
         center: Offset(x + width / 1.5, y + height / 3.0),
@@ -45,12 +46,13 @@ class TomatoPainter extends CustomPainter {
         tomatoPaint);
 
     if (isTimer) {
-      drawTimerInfo(height, x, y, width, canvas,
-          colorOverride ?? PaintColor(const Color.fromARGB(255, 220, 95, 95)));
+      drawTimerInfo(height, x, y, width, canvas, colorOverride ?? tomatoColor);
     }
 
-    var (stemWidth, stemHeight) = drawStem(x, y, width, height, canvas);
+    var stemWidth = width / 15.0;
+    var stemHeight = stemWidth * 2;
     drawStemLeafs(canvas, x, y, width, height, stemWidth, stemHeight);
+    drawStem(x, y, width, height, stemWidth, stemHeight, canvas);
   }
 
   void drawTimerInfo(double height, double x, double y, double width,
@@ -66,10 +68,8 @@ class TomatoPainter extends CustomPainter {
     canvas.drawPath(linePath, linePaint);
   }
 
-  (double, double) drawStem(double x, double y, double tomatoWidth,
-      double tomatoHeight, Canvas canvas) {
-    var stemWidth = tomatoWidth / 15.0;
-    var stemHeight = stemWidth * 2;
+  drawStem(double x, double y, double tomatoWidth, double tomatoHeight,
+      double stemWidth, double stemHeight, Canvas canvas) {
     var startingX = x + (tomatoWidth / 2.0) - stemWidth;
     var startingY = y + (tomatoHeight / 11.0);
 
@@ -94,7 +94,6 @@ class TomatoPainter extends CustomPainter {
   void drawStemLeafs(Canvas canvas, double x, double y, double width,
       double height, double stemWidth, double stemHeight) {
     var stemLeafPaint = Paint()
-      ..color = const Color.fromARGB(255, 78, 134, 81)
       ..style = PaintingStyle.fill
       ..shader = RadialGradient(
         colors: [
@@ -113,20 +112,21 @@ class TomatoPainter extends CustomPainter {
 
   Path createStemLeafsPath(double x, double y, double tomatoWidth,
       double tomatoHeight, double stemWidth, double stemHeight) {
-    var startingX = x + (tomatoWidth / 2.0) - stemWidth;
-    var startingY = y + (tomatoHeight / 11.0);
+    var startingX = x + (tomatoWidth / 2.0) - stemWidth * 1.5;
+    var startingY = y + (tomatoHeight / 14.0);
 
     var leafLength = tomatoWidth / 4;
 
     Path path = Path();
 
-    path.moveTo(startingX + leafLength, startingY);
-    path.arcToPoint(Offset(startingX, startingY),
-        radius: Radius.circular(stemHeight * 1.2), clockwise: false);
-
-    path.moveTo(startingX - leafLength, startingY);
+    path.moveTo(startingX + leafLength, startingY - stemHeight);
     path.arcToPoint(Offset(startingX, startingY),
         radius: Radius.circular(stemHeight * 1.2));
+
+    startingX = x + (tomatoWidth / 2.0) - stemWidth / 2;
+    path.moveTo(startingX - leafLength, startingY - stemHeight);
+    path.arcToPoint(Offset(startingX, startingY),
+        radius: Radius.circular(stemHeight * 1.2), clockwise: false);
 
     return path;
   }
